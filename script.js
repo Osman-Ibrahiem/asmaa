@@ -176,6 +176,7 @@ function blowCandle() {
   candleOut = true;
   cake.classList.add('out');
   $('#cakeHint').textContent = 'براڤو يا قمر 🎉 اتمني أمنية!';
+  $('#micBtn').hidden = true;
   enterBtn.classList.add('ready');
   burst(0.5, 0.45, 60);
   if (navigator.vibrate) navigator.vibrate([40, 60, 40]);
@@ -183,36 +184,83 @@ function blowCandle() {
 
 cake.addEventListener('click', blowCandle);
 
-/* نفخ حقيقي عن طريق المايك (لو المستخدم سمح) */
-$('#micNote').addEventListener('click', startMic);
+/* ---------- نفخ حقيقي عن طريق المايك ---------- */
+const micBtn = $('#micBtn');
+micBtn.addEventListener('click', startMic);
+
+/* لازم نقفل معالجة الصوت — الـ noise suppression بيعتبر النفخ ضوضاء وبيمسحه */
+const MIC_CONSTRAINTS = {
+  audio: {
+    echoCancellation: false,
+    noiseSuppression: false,
+    autoGainControl: false,
+  },
+};
+
+const BLOW_LEVEL = 0.10;   /* مستوى الصوت المطلوب */
+const BLOW_FRAMES = 5;     /* لازم يفضل ثابت شوية عشان تصفيقة أو كلمة ما تطفّهاش */
 
 async function startMic() {
-  if (!navigator.mediaDevices?.getUserMedia) return;
-  try {
-    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-    const ac = new (window.AudioContext || window.webkitAudioContext)();
-    const analyser = ac.createAnalyser();
-    analyser.fftSize = 512;
-    ac.createMediaStreamSource(stream).connect(analyser);
-    const data = new Uint8Array(analyser.frequencyBinCount);
-
-    $('#micNote').textContent = 'المايك شغّال — انفخي 🌬️';
-
-    (function listen() {
-      analyser.getByteTimeDomainData(data);
-      let peak = 0;
-      for (const v of data) peak = Math.max(peak, Math.abs(v - 128));
-      if (peak > 42) {
-        blowCandle();
-        stream.getTracks().forEach((t) => t.stop());
-        ac.close();
-        return;
-      }
-      if (!candleOut) requestAnimationFrame(listen);
-    })();
-  } catch {
-    $('#micNote').textContent = 'مفيش مايك؟ عادي — دوسي على الشمعة 🕯️';
+  if (!navigator.mediaDevices?.getUserMedia) {
+    micBtn.textContent = 'المتصفح ده مش بيدعم المايك — دوسي على الشمعة 🕯️';
+    micBtn.disabled = true;
+    return;
   }
+
+  micBtn.disabled = true;
+  micBtn.textContent = 'بستأذن على المايك…';
+
+  let stream;
+  try {
+    stream = await navigator.mediaDevices.getUserMedia(MIC_CONSTRAINTS);
+  } catch {
+    micBtn.textContent = 'مفيش إذن للمايك — دوسي على الشمعة 🕯️';
+    return;
+  }
+
+  const ac = new (window.AudioContext || window.webkitAudioContext)();
+  await ac.resume();   /* على الموبايل بيفتح موقوف لحد ما المستخدم يتفاعل */
+
+  const analyser = ac.createAnalyser();
+  analyser.fftSize = 1024;
+  analyser.smoothingTimeConstant = 0.3;
+  ac.createMediaStreamSource(stream).connect(analyser);
+
+  const wave = new Uint8Array(analyser.fftSize);
+  const meter = $('#micMeter');
+  const level = $('#micLevel');
+
+  meter.hidden = false;
+  micBtn.textContent = 'المايك شغّال — انفخي 🌬️';
+
+  let loud = 0;
+
+  function stop() {
+    stream.getTracks().forEach((t) => t.stop());
+    ac.close();
+    meter.hidden = true;
+  }
+
+  (function listen() {
+    if (candleOut) { stop(); return; }
+
+    analyser.getByteTimeDomainData(wave);
+
+    /* RMS = متوسط قوة الموجة، أدق من أعلى نقطة لأنه مش بيتأثر بطقطقة لحظية */
+    let sum = 0;
+    for (const v of wave) {
+      const x = (v - 128) / 128;
+      sum += x * x;
+    }
+    const rms = Math.sqrt(sum / wave.length);
+
+    level.style.width = Math.min(100, (rms / BLOW_LEVEL) * 100) + '%';
+
+    loud = rms > BLOW_LEVEL ? loud + 1 : 0;
+    if (loud >= BLOW_FRAMES) { blowCandle(); stop(); return; }
+
+    requestAnimationFrame(listen);
+  })();
 }
 
 /* ---------- 3) الدخول للمحتوى ---------- */
