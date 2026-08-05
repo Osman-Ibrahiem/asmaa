@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>كل سنة وأنتي طيبة يا أسماء 🎂</title>
+  <meta name="theme-color" content="#b5179e">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;800;900&family=Aref+Ruqaa:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+</head>
+
+<body>
+
+  <!-- ===== خلفية متحركة عامة ===== -->
+  <div class="aurora" aria-hidden="true">
+    <span class="blob b1"></span>
+    <span class="blob b2"></span>
+    <span class="blob b3"></span>
+  </div>
+  <canvas id="petals" aria-hidden="true"></canvas>
+
+  <!-- ===== 1) شاشة البداية: التورتة والشمعة ===== -->
+  <section id="splash">
+    <div class="splash-card">
+      <p class="kicker">٦ أغسطس ٢٠٠٢ — يوم ما الدنيا اتغيرت للأحسن</p>
+      <h1 class="splash-title">عيد ميلاد <span class="shine">أسماء</span></h1>
+
+      <div class="cake-wrap">
+        <div class="cake" id="cake">
+          <div class="flame" id="flame"></div>
+          <div class="candle"></div>
+          <div class="layer top"></div>
+          <div class="layer mid"></div>
+          <div class="layer base"></div>
+          <div class="plate"></div>
+        </div>
+      </div>
+
+      <p class="hint" id="cakeHint">اطفي الشمعة 🕯️ (دوسي عليها أو انفخي في المايك)</p>
+      <button class="btn-glow" id="enterBtn">افتحي هديتك 🎁</button>
+      <p class="mic-note" id="micNote">لو عايزة تنفخي بجد، اسمحي بالمايك ✨</p>
+    </div>
+  </section>
+
+  <!-- ===== 2) المحتوى ===== -->
+  <main id="content" hidden>
+
+    <!-- الهيرو -->
+    <header class="hero">
+      <div class="hero-photo reveal">
+        <img id="heroImg" src="images/hero.jpeg" alt="أسماء" onerror="this.closest('.hero-photo').classList.add('empty')">
+        <span class="ring r1"></span>
+        <span class="ring r2"></span>
+      </div>
+      <h1 class="hero-title reveal">كل سنة وأنتي طيبة<br><span class="grad">يا أسماء ❤️</span></h1>
+      <p class="hero-sub reveal" id="typewriter"></p>
+
+      <!-- العدّاد الحيّ: تنازلي قبل نص الليل، وطالع بعده -->
+      <div class="countdown reveal" id="countdown">
+        <p class="cd-label" id="cdLabel"></p>
+        <div class="cd-units" id="cdUnits"></div>
+      </div>
+
+      <div class="scroll-cue reveal"><span></span></div>
+    </header>
+
+    <!-- عدّادات -->
+    <section class="stats" id="stats"><!-- يتولّد من script.js --></section>
+
+    <!-- المعرض -->
+    <section class="section">
+      <h2 class="section-title reveal">ذكرياتنا 📸</h2>
+      <div class="gallery" id="gallery"><!-- يتولّد من script.js --></div>
+    </section>
+
+    <!-- الخط الزمني -->
+    <section class="section">
+      <h2 class="section-title reveal">حكايتنا ✨</h2>
+      <div class="timeline" id="timeline"><!-- يتولّد من script.js --></div>
+    </section>
+
+    <!-- أسباب بحبك -->
+    <section class="section">
+      <h2 class="section-title reveal">أسباب بحبك 💌</h2>
+      <p class="section-note reveal">اقلبي كل كارت</p>
+      <div class="reasons" id="reasons"><!-- يتولّد من script.js --></div>
+    </section>
+
+    <!-- الرسالة -->
+    <section class="section">
+      <div class="letter reveal">
+        <div class="letter-seal">أ</div>
+        <h2>رسالة صغيرة من قلبي</h2>
+        <p id="letterText"></p>
+        <span class="sign">— عثمان</span>
+      </div>
+    </section>
+
+    <!-- الهدية -->
+    <section class="section finale">
+      <div class="gift-stage reveal">
+        <p class="hint" id="giftHint">دوسي على الصندوق 🎁</p>
+        <button class="gift" id="giftBox" aria-label="افتحي الهدية">
+          <span class="lid"></span>
+          <span class="box"></span>
+          <span class="ribbon"></span>
+        </button>
+        <div class="wish" id="wish" hidden>
+          <h3>أمنيتي ليكي</h3>
+          <p>ربنا يخليكي ليا، ويفرح قلبك زي ما بتفرحي قلبي كل يوم.<br>كل سنة وأنتي حبيبتي وستّ الكل يا أم زيزو 👑</p>
+          <button class="btn-glow small" id="againBtn">كمان مرة 🎉</button>
+        </div>
+      </div>
+    </section>
+
+    <footer class="foot">صُنع بحب ❤️ لأسماء</footer>
+  </main>
+
+  <!-- ===== لايت بوكس ===== -->
+  <div class="lightbox" id="lightbox" hidden>
+    <button class="lb-close" id="lbClose" aria-label="إغلاق">✕</button>
+    <button class="lb-nav prev" id="lbPrev" aria-label="السابق">❯</button>
+    <img id="lbImg" alt="">
+    <p id="lbCap"></p>
+    <button class="lb-nav next" id="lbNext" aria-label="التالي">❮</button>
+  </div>
+
+  <!-- ===== المزيكا ===== -->
+  <audio id="bgMusic" loop preload="none">
+    <source src="song.mp3" type="audio/mpeg">
+  </audio>
+  <button id="musicBtn" class="music-btn" hidden aria-label="تشغيل/إيقاف المزيكا">
+    <span class="bars"><i></i><i></i><i></i></span>
+  </button>
+
+  <script src="script.js"></script>
+</body>
+
+</html>
