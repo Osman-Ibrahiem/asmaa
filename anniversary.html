@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>٣ سنين على فرحنا يا أسماء 💍</title>
+  <meta name="theme-color" content="#0b1026">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&family=Amiri:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+  <style>
+    :root {
+      --night: #0b1026;
+      --night-2: #131a3a;
+      --gold: #e9c46a;
+      --gold-soft: #f4e3b8;
+      --rose: #d98a9e;
+      --ink: #eef1ff;
+      --muted: #9aa3c7;
+      --line: rgba(233, 196, 106, .28);
+      --r: 22px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    [hidden] { display: none !important; }
+
+    html, body {
+      font-family: 'Cairo', system-ui, sans-serif;
+      color: var(--ink);
+      background: var(--night);
+      overflow-x: hidden;
+      -webkit-tap-highlight-color: transparent;
+      line-height: 1.8;
+    }
+
+    body.locked { overflow: hidden; }
+
+    h1, h2, h3 {
+      font-family: 'Amiri', 'Cairo', serif;
+      font-weight: 700;
+      line-height: 1.5;
+    }
+
+    /* ===== سماء الليل ===== */
+    .sky {
+      position: fixed;
+      inset: 0;
+      z-index: -3;
+      background:
+        radial-gradient(1200px 700px at 50% -10%, #26305e 0%, transparent 60%),
+        radial-gradient(900px 600px at 10% 100%, #2a1c3a 0%, transparent 55%),
+        linear-gradient(180deg, #0b1026 0%, #0e1330 55%, #140f2a 100%);
+    }
+    #stars { position: fixed; inset: 0; z-index: -2; }
+    .moon {
+      position: fixed;
+      top: 7vh; left: 12vw;
+      width: 90px; height: 90px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 35% 35%, #fff7e0, #e9c46a 70%, #caa24a);
+      box-shadow: 0 0 60px 12px rgba(233, 196, 106, .35);
+      z-index: -2;
+    }
+
+    .wrap { max-width: 780px; margin: 0 auto; padding: 0 20px; }
+
+    /* ===== البداية ===== */
+    #intro {
+      min-height: 100svh;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      text-align: center;
+      gap: 22px;
+      padding: 40px 20px;
+    }
+    .badge {
+      display: inline-flex; align-items: center; gap: 8px;
+      border: 1px solid var(--line);
+      color: var(--gold-soft);
+      padding: 8px 18px;
+      border-radius: 999px;
+      font-size: .9rem;
+      letter-spacing: .5px;
+      background: rgba(233, 196, 106, .06);
+    }
+    .big {
+      font-size: clamp(2.4rem, 9vw, 4.6rem);
+      color: #fff;
+      text-shadow: 0 2px 30px rgba(233, 196, 106, .25);
+    }
+    .big .num {
+      color: var(--gold);
+      font-size: 1.25em;
+      display: inline-block;
+      animation: pulse 3s ease-in-out infinite;
+    }
+    @keyframes pulse { 50% { transform: scale(1.06); text-shadow: 0 0 40px rgba(233,196,106,.6); } }
+    .sub { color: var(--muted); max-width: 40ch; }
+
+    .cta {
+      margin-top: 10px;
+      border: none;
+      background: linear-gradient(135deg, var(--gold), #d98a9e);
+      color: #201502;
+      font-family: 'Cairo', sans-serif;
+      font-weight: 700;
+      font-size: 1.05rem;
+      padding: 14px 34px;
+      border-radius: 999px;
+      cursor: pointer;
+      box-shadow: 0 12px 40px rgba(233, 196, 106, .3);
+      transition: transform .2s;
+    }
+    .cta:active { transform: scale(.96); }
+
+    .scroll-hint { color: var(--muted); font-size: .85rem; margin-top: 8px; animation: bob 2s ease-in-out infinite; }
+    @keyframes bob { 50% { transform: translateY(6px); } }
+
+    /* ===== الأقسام ===== */
+    main { padding: 30px 0 90px; }
+    .block { padding: 46px 0; }
+    .block h2 {
+      font-size: clamp(1.7rem, 5.5vw, 2.4rem);
+      color: var(--gold-soft);
+      text-align: center;
+      margin-bottom: 6px;
+    }
+    .block h2::after {
+      content: "";
+      display: block;
+      width: 60px; height: 2px;
+      margin: 14px auto 0;
+      background: linear-gradient(90deg, transparent, var(--gold), transparent);
+    }
+    .note { text-align: center; color: var(--muted); margin-bottom: 26px; font-size: .95rem; }
+
+    .reveal { opacity: 0; transform: translateY(24px); transition: opacity .7s, transform .7s; }
+    .reveal.in { opacity: 1; transform: none; }
+
+    /* ===== العدّاد ===== */
+    .clock {
+      display: flex; justify-content: center; gap: 12px;
+      flex-wrap: wrap;
+    }
+    .cell {
+      min-width: 78px;
+      background: linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.02));
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 14px 10px;
+      text-align: center;
+    }
+    .cell b { display: block; font-size: 1.9rem; color: #fff; font-family: 'Amiri', serif; }
+    .cell span { font-size: .8rem; color: var(--muted); }
+    .clock-label { text-align: center; color: var(--gold-soft); margin-bottom: 16px; }
+
+    /* ===== أرقام ===== */
+    .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+    .stat {
+      text-align: center;
+      padding: 22px 10px;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      background: rgba(233, 196, 106, .04);
+    }
+    .stat b { display: block; font-size: 1.7rem; color: var(--gold); font-family: 'Amiri', serif; }
+    .stat span { font-size: .82rem; color: var(--muted); }
+    @media (max-width: 460px) { .stat b { font-size: 1.35rem; } .cell { min-width: 66px; } }
+
+    /* ===== الخط الزمني ===== */
+    .timeline { position: relative; padding-right: 26px; }
+    .timeline::before {
+      content: ""; position: absolute; right: 6px; top: 6px; bottom: 6px;
+      width: 2px; background: linear-gradient(var(--gold), transparent);
+    }
+    .tl-item { position: relative; margin-bottom: 26px; }
+    .tl-item::before {
+      content: ""; position: absolute; right: -24px; top: 8px;
+      width: 12px; height: 12px; border-radius: 50%;
+      background: var(--gold); box-shadow: 0 0 12px var(--gold);
+    }
+    .tl-item .d { color: var(--gold-soft); font-size: .82rem; }
+    .tl-item h3 { color: #fff; font-size: 1.1rem; }
+    .tl-item p { color: var(--muted); font-size: .95rem; }
+
+    /* ===== المعرض ===== */
+    .gallery { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+    .gallery figure {
+      position: relative; overflow: hidden; border-radius: 14px;
+      aspect-ratio: 1; border: 1px solid var(--line); cursor: pointer;
+    }
+    .gallery img { width: 100%; height: 100%; object-fit: cover; transition: transform .5s; }
+    .gallery figure:hover img { transform: scale(1.08); }
+    .gallery figcaption {
+      position: absolute; inset: auto 0 0 0;
+      background: linear-gradient(transparent, rgba(11,16,38,.9));
+      color: #fff; font-size: .78rem; padding: 18px 8px 8px;
+    }
+    .gallery figure.missing img { display: none; }
+    .gallery figure.missing::after {
+      content: attr(data-file); position: absolute; inset: 0;
+      display: grid; place-items: center; color: var(--muted);
+      font-size: .7rem; border: 1px dashed var(--line);
+    }
+    @media (max-width: 460px) { .gallery { grid-template-columns: repeat(2, 1fr); } }
+
+    /* ===== الرسالة ===== */
+    .letter {
+      border: 1px solid var(--line);
+      border-radius: var(--r);
+      padding: 34px 26px;
+      background:
+        radial-gradient(120% 60% at 50% 0%, rgba(233,196,106,.08), transparent),
+        rgba(255,255,255,.03);
+      text-align: center;
+    }
+    .letter h2 { margin-bottom: 16px; }
+    .letter p { white-space: pre-line; color: #e7e9fb; font-size: 1rem; }
+    .letter .sign {
+      display: block; margin-top: 18px; color: var(--gold);
+      font-family: 'Amiri', serif; font-size: 1.2rem;
+    }
+
+    /* ===== فانوس ===== */
+    .lantern-stage { text-align: center; }
+    .lantern-btn {
+      border: 1px solid var(--line);
+      background: rgba(233, 196, 106, .06);
+      color: var(--gold-soft);
+      padding: 12px 26px; border-radius: 999px;
+      font-family: 'Cairo', sans-serif; font-weight: 700;
+      cursor: pointer; font-size: 1rem;
+    }
+    .flyer {
+      position: fixed; bottom: -80px; font-size: 2rem;
+      pointer-events: none; z-index: 40;
+      animation: fly linear forwards;
+      filter: drop-shadow(0 0 14px rgba(233,196,106,.7));
+    }
+    @keyframes fly {
+      to { transform: translateY(-120svh) rotate(8deg); opacity: 0; }
+    }
+
+    .foot { text-align: center; color: var(--muted); font-size: .85rem; padding: 30px 0 10px; }
+
+    /* ===== لايت بوكس ===== */
+    .lb {
+      position: fixed; inset: 0; z-index: 60;
+      background: rgba(6, 9, 22, .94);
+      display: flex; align-items: center; justify-content: center;
+      flex-direction: column; gap: 12px; padding: 20px;
+    }
+    .lb img { max-width: 92vw; max-height: 78vh; border-radius: 14px; }
+    .lb p { color: var(--gold-soft); }
+    .lb button {
+      position: absolute; top: 16px; left: 16px;
+      background: none; border: 1px solid var(--line); color: #fff;
+      width: 40px; height: 40px; border-radius: 50%; font-size: 1.1rem; cursor: pointer;
+    }
+
+    /* ===== مزيكا ===== */
+    .music-btn {
+      position: fixed; bottom: 16px; left: 16px; z-index: 50;
+      width: 46px; height: 46px; border-radius: 50%;
+      border: 1px solid var(--line);
+      background: rgba(11, 16, 38, .8);
+      color: var(--gold); font-size: 1.1rem; cursor: pointer;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .reveal { opacity: 1; transform: none; transition: none; }
+      .big .num, .scroll-hint { animation: none; }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="sky" aria-hidden="true"></div>
+  <canvas id="stars" aria-hidden="true"></canvas>
+  <div class="moon" aria-hidden="true"></div>
+
+  <!-- البداية -->
+  <section id="intro">
+    <span class="badge">٩ سبتمبر ٢٠٢٣ — الليلة اللي بدأ منها كل حاجة</span>
+    <h1 class="big"><span class="num" id="yearsBig">٣</span><br>سنين وإحنا مع بعض</h1>
+    <p class="sub">من ليلة الفرح لحد النهاردة.. وكل يوم بيثبت إن الاختيار كان صح يا أسماء ❤️</p>
+    <button class="cta" id="startBtn">افتحي الذكرى 💍</button>
+    <p class="scroll-hint">↓</p>
+  </section>
+
+  <!-- المحتوى -->
+  <main id="content" hidden>
+    <div class="wrap">
+
+      <section class="block reveal">
+        <h2>عدّاد الذكرى الجاية</h2>
+        <p class="clock-label" id="clockLabel"></p>
+        <div class="clock" id="clock"></div>
+      </section>
+
+      <section class="block reveal">
+        <h2>٣ سنين بالأرقام</h2>
+        <div class="stats" id="stats"></div>
+      </section>
+
+      <section class="block reveal">
+        <h2>حكايتنا</h2>
+        <div class="timeline" id="timeline"></div>
+      </section>
+
+      <section class="block reveal">
+        <h2>لحظات</h2>
+        <p class="note">دوسي على أي صورة</p>
+        <div class="gallery" id="gallery"></div>
+      </section>
+
+      <section class="block reveal">
+        <div class="letter">
+          <h2>كلمة في ذكرى فرحنا</h2>
+          <p id="letterText"></p>
+          <span class="sign">— عثمان</span>
+        </div>
+      </section>
+
+      <section class="block reveal lantern-stage">
+        <h2>طيّري أمنية</h2>
+        <p class="note">زي فوانيس ليلة الفرح</p>
+        <button class="lantern-btn" id="lanternBtn">🏮 طيّري فانوس</button>
+      </section>
+
+      <p class="foot">صُنع بحب ❤️ — الذكرى التالتة</p>
+    </div>
+  </main>
+
+  <div class="lb" id="lb" hidden>
+    <button id="lbClose" aria-label="إغلاق">✕</button>
+    <img id="lbImg" alt="">
+    <p id="lbCap"></p>
+  </div>
+
+  <audio id="bgMusic" loop preload="none"><source src="song.mp3" type="audio/mpeg"></audio>
+  <button class="music-btn" id="musicBtn" hidden aria-label="مزيكا">♪</button>
+
+  <script>
+    /* ================= CONFIG ================= */
+    const CONFIG = {
+      wedding: new Date(2023, 8, 9),   // ٩ سبتمبر ٢٠٢٣
+      firstMet: new Date(2022, 4, 5),
+
+      stats: [
+        { label: 'يوم مع بعض',   from: 'wedding', unit: 'days' },
+        { label: 'شهر مع بعض',   from: 'wedding', unit: 'months' },
+        { label: 'سنة نصيب',     from: 'firstMet', unit: 'years' },
+      ],
+
+      timeline: [
+        { d: '٥ مايو ٢٠٢٢',    t: 'أول مرة شفتك 👀', p: 'يوم قسم حياتي: قبلك.. وبعدك.' },
+        { d: '٢٨ مايو ٢٠٢٢',   t: 'قرينا الفاتحة 🤲', p: '٢٣ يوم كفاية أعرف إنك أنتي.' },
+        { d: '١١ يوليو ٢٠٢٢',  t: 'الشبكة 💍', p: 'أول حاجة تقول للدنيا إنك ليا.' },
+        { d: '٢٩ يونيو ٢٠٢٣',  t: 'كتب الكتاب 📜', p: 'وقّعنا على ورق، والقلب كان موقّع من زمان.' },
+        { d: '٩ سبتمبر ٢٠٢٣',  t: 'الفرح 🎊', p: 'أحلى ليلة في عمري، ومنها البيت بقى بيت.' },
+        { d: 'السنة الأولى',   t: 'اتعلّمنا بعض', p: 'عرفنا نضحك من قلبنا ونتخانق ونصالح بسرعة.' },
+        { d: 'السنة التانية',  t: 'بقينا فريق', p: 'كل ظرف عدّيناه وإحنا ماسكين إيد بعض.' },
+        { d: 'السنة التالتة',  t: 'وأنا لسه بختارك 💛', p: 'كل يوم وأنا أكيد أكتر إن نصيبي أحلى نصيب.' },
+        { d: 'اللي جاي',       t: 'باقي العمر ♾️', p: 'ووعد إن كل سنة تكون أحلى من اللي فاتت.' },
+      ],
+
+      photos: [
+        ['photo1.jpeg', 'يا قمر 🌙'], ['photo2.jpeg', 'ضحكتك بتنوّر'],
+        ['photo3.jpeg', 'لحظة مش بتتنسي'], ['photo4.jpeg', 'أحلى الأوقات'],
+        ['photo5.jpeg', 'وأنتي على طبيعتك 🌸'], ['photo6.jpeg', 'كل صورة ذكرى'],
+        ['photo7.jpeg', 'حبيبة قلبي ❤️'], ['photo8.jpeg', 'الدنيا حلوة وأنتي فيها'],
+        ['photo9.jpeg', 'يا ستّ الكل 👑'], ['photo10.jpeg', 'عمري كله معاكي'],
+        ['photo11.jpeg', 'أنتي وبس ✨'],
+      ],
+
+      letter:
+        'أسماء،\n' +
+        'تلات سنين بالتمام من ليلة ٩ سبتمبر، وأنا لسه فاكر كل تفصيلة فيها.\n' +
+        'السنين دي فيها أيام حلوة وأيام تعبانة، بس مفيش يوم واحد ندمت فيه إني اخترتك.\n' +
+        'شكراً إنك بيت، وإنك سند، وإنك بتخليني أحس إني في مكاني الصح.\n' +
+        'كل سنة وإحنا مع بعض يا أم زيزو، وربنا يخلينا لبعض لباقي العمر 💍❤️',
+    };
+
+    /* ================= helpers ================= */
+    const $ = s => document.querySelector(s);
+    const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const AR = n => String(n).replace(/\d/g, d => '٠١٢٣٤٥٦٧٨٩'[d]);
+    const DAY = 86400000;
+
+    function diff(from) {
+      const now = new Date();
+      const days = Math.floor((now - from) / DAY);
+      const months = (now.getFullYear() - from.getFullYear()) * 12 + (now.getMonth() - from.getMonth()) - (now.getDate() < from.getDate() ? 1 : 0);
+      let years = now.getFullYear() - from.getFullYear();
+      const md = now.getMonth() - from.getMonth() || now.getDate() - from.getDate();
+      if (md < 0) years--;
+      return { days, months, years };
+    }
+
+    /* ================= stars ================= */
+    (function stars() {
+      if (reduce) return;
+      const c = $('#stars'), x = c.getContext('2d');
+      let pts = [];
+      function resize() {
+        c.width = innerWidth; c.height = innerHeight;
+        pts = Array.from({ length: Math.round(innerWidth * innerHeight / 6000) }, () => ({
+          x: Math.random() * c.width, y: Math.random() * c.height,
+          r: Math.random() * 1.4 + .3, tw: Math.random() * Math.PI * 2,
+        }));
+      }
+      resize(); addEventListener('resize', resize);
+      (function loop() {
+        x.clearRect(0, 0, c.width, c.height);
+        for (const p of pts) {
+          p.tw += .03;
+          x.globalAlpha = .4 + Math.sin(p.tw) * .35;
+          x.fillStyle = '#f4e3b8';
+          x.beginPath(); x.arc(p.x, p.y, p.r, 0, 7); x.fill();
+        }
+        requestAnimationFrame(loop);
+      })();
+    })();
+
+    /* ================= build content ================= */
+    function build() {
+      // stats
+      $('#stats').innerHTML = CONFIG.stats.map(s => {
+        const v = diff(CONFIG[s.from])[s.unit];
+        return `<div class="stat"><b>${AR(v.toLocaleString('en'))}</b><span>${s.label}</span></div>`;
+      }).join('');
+
+      // timeline
+      $('#timeline').innerHTML = CONFIG.timeline.map(i =>
+        `<div class="tl-item"><div class="d">${i.d}</div><h3>${i.t}</h3><p>${i.p}</p></div>`).join('');
+
+      // gallery
+      $('#gallery').innerHTML = CONFIG.photos.map(([f, cap], idx) =>
+        `<figure data-file="${f}" data-idx="${idx}">
+           <img src="images/${f}" alt="${cap}" loading="lazy"
+                onerror="this.closest('figure').classList.add('missing')">
+           <figcaption>${cap}</figcaption>
+         </figure>`).join('');
+
+      $('#letterText').textContent = CONFIG.letter;
+    }
+
+    /* ================= countdown to next anniversary ================= */
+    function nextAnniv() {
+      const now = new Date();
+      let y = now.getFullYear();
+      let target = new Date(y, 8, 9);
+      if (now >= target) target = new Date(y + 1, 8, 9);
+      return target;
+    }
+    function tickClock() {
+      const t = nextAnniv();
+      const yearNo = t.getFullYear() - CONFIG.wedding.getFullYear();
+      let ms = t - new Date();
+      const d = Math.floor(ms / DAY); ms -= d * DAY;
+      const h = Math.floor(ms / 3.6e6); ms -= h * 3.6e6;
+      const m = Math.floor(ms / 6e4); ms -= m * 6e4;
+      const s = Math.floor(ms / 1000);
+      $('#clockLabel').textContent = `فاضل على الذكرى الـ${AR(yearNo)}`;
+      const cells = [[d, 'يوم'], [h, 'ساعة'], [m, 'دقيقة'], [s, 'ثانية']];
+      $('#clock').innerHTML = cells.map(([v, l]) =>
+        `<div class="cell"><b>${AR(String(v).padStart(2, '0'))}</b><span>${l}</span></div>`).join('');
+    }
+
+    /* ================= reveal ================= */
+    const io = new IntersectionObserver(es => {
+      es.forEach(e => e.isIntersecting && e.target.classList.add('in'));
+    }, { threshold: .15 });
+
+    /* ================= lightbox ================= */
+    function openLb(idx) {
+      const [f, cap] = CONFIG.photos[idx];
+      $('#lbImg').src = `images/${f}`;
+      $('#lbCap').textContent = cap;
+      $('#lb').hidden = false;
+    }
+    $('#lbClose').onclick = () => $('#lb').hidden = true;
+    $('#lb').onclick = e => { if (e.target.id === 'lb') $('#lb').hidden = true; };
+
+    /* ================= lantern ================= */
+    $('#lanternBtn').onclick = () => {
+      for (let i = 0; i < 6; i++) {
+        setTimeout(() => {
+          const el = document.createElement('div');
+          el.className = 'flyer';
+          el.textContent = Math.random() < .5 ? '🏮' : '✨';
+          el.style.left = (10 + Math.random() * 80) + 'vw';
+          el.style.animationDuration = (5 + Math.random() * 4) + 's';
+          document.body.appendChild(el);
+          setTimeout(() => el.remove(), 10000);
+        }, i * 250);
+      }
+      if (window.confetti) confetti({ particleCount: 60, spread: 70, origin: { y: .8 }, colors: ['#e9c46a', '#d98a9e', '#fff7e0'] });
+    };
+
+    /* ================= music ================= */
+    const music = $('#bgMusic'), mBtn = $('#musicBtn');
+    mBtn.onclick = () => { music.paused ? music.play() : music.pause(); mBtn.textContent = music.paused ? '♪' : '❚❚'; };
+
+    /* ================= start ================= */
+    $('#startBtn').onclick = () => {
+      $('#content').hidden = false;
+      build();
+      document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+      document.querySelectorAll('#gallery figure').forEach(fig =>
+        fig.addEventListener('click', () => openLb(+fig.dataset.idx)));
+      tickClock(); setInterval(tickClock, 1000);
+      mBtn.hidden = false;
+      music.play().then(() => mBtn.textContent = '❚❚').catch(() => {});
+      if (window.confetti) confetti({ particleCount: 120, spread: 100, origin: { y: .6 }, colors: ['#e9c46a', '#d98a9e', '#fff7e0'] });
+      $('#content').scrollIntoView({ behavior: 'smooth' });
+    };
+  </script>
+</body>
+
+</html>
