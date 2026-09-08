@@ -155,12 +155,19 @@
       margin-bottom: 16px;
     }
     .marquee::before, .marquee::after { content: "●"; font-size: .6rem; color: var(--rose); }
-    .reels { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; }
-    @media (max-width: 560px) { .reels { grid-template-columns: 1fr; } }
+    .reels { display: flex; flex-direction: column; gap: 58px; }
+    .reel-item { display: flex; flex-direction: column; align-items: center; gap: 14px; }
+    .reel-no {
+      display: flex; align-items: center; gap: 12px;
+      color: var(--gold); font-family: 'Amiri', serif;
+      letter-spacing: 3px; font-size: .95rem;
+    }
+    .reel-no::before, .reel-no::after { content: ""; width: 40px; height: 1px; background: var(--line); }
     .reel {
-      position: relative; border-radius: 16px; overflow: hidden;
+      position: relative; border-radius: 18px; overflow: hidden;
       border: 1px solid var(--line); background: #060812;
-      aspect-ratio: 9 / 12;
+      width: 100%; max-width: 320px; aspect-ratio: 9 / 16;
+      box-shadow: 0 20px 50px rgba(0,0,0,.35);
     }
     .reel video { width: 100%; height: 100%; object-fit: cover; display: block; background: #060812; }
     .reel .play {
@@ -439,43 +446,71 @@
       }).join('');
 
       $('#reels').innerHTML = CONFIG.videos.map((v, i) => `
-        <div class="reel" id="reel${i}" data-file="videos/${v.file}">
-          <video preload="metadata" playsinline
-                 poster="videos/${v.cover}"
-                 onerror="this.closest('.reel').classList.add('missing')">
-            <source src="videos/${v.file}" type="video/mp4">
-          </video>
-          <button class="play" data-i="${i}" aria-label="تشغيل"><span class="ico">▶</span></button>
+        <div class="reel-item">
+          <div class="reel-no">مقطع ${AR(String(i + 1))}</div>
+          <div class="reel" id="reel${i}" data-file="videos/${v.file}">
+            <video preload="metadata" playsinline
+                   poster="videos/${v.cover}"
+                   onerror="this.closest('.reel').classList.add('missing')">
+              <source src="videos/${v.file}" type="video/mp4">
+            </video>
+            <button class="play" data-i="${i}" aria-label="تشغيل"><span class="ico">▶</span></button>
+          </div>
         </div>`).join('');
 
       document.querySelectorAll('.reel .play').forEach(btn =>
-        btn.addEventListener('click', () => playReel(+btn.dataset.i)));
+        btn.addEventListener('click', () => startReel(+btn.dataset.i)));
 
       // علّم الكارت بإنه ناقص لو ملف الفيديو مش موجود
       document.querySelectorAll('.reel source').forEach(src =>
         src.addEventListener('error', () => src.closest('.reel').classList.add('missing')));
 
-      // اعرض أول فريم كصورة غلاف قبل التشغيل
-      document.querySelectorAll('.reel video').forEach(v =>
-        v.addEventListener('loadedmetadata', () => { try { v.currentTime = 0.1; } catch (e) {} }, { once: true }));
+      document.querySelectorAll('.reel video').forEach(vid => {
+        // اعرض أول فريم كصورة غلاف قبل التشغيل
+        vid.addEventListener('loadedmetadata', () => { try { vid.currentTime = 0.1; } catch (e) {} }, { once: true });
+
+        // أول ما فيديو يشتغل: وقّف باقي الفيديوهات + وقّف المزيكا + افتح فل اسكرين
+        vid.addEventListener('play', () => {
+          document.querySelectorAll('.reel video').forEach(other => {
+            if (other !== vid) { other.pause(); other.removeAttribute('controls'); other.closest('.reel').classList.remove('playing'); }
+          });
+          vid.closest('.reel').classList.add('playing');
+          if (!music.paused) { musicWasPlaying = true; music.pause(); setMusicBtn(); }
+          goFullscreen(vid);
+        });
+        vid.addEventListener('pause', () => { vid.closest('.reel').classList.remove('playing'); resumeMusicIfIdle(); });
+        vid.addEventListener('ended', () => { vid.closest('.reel').classList.remove('playing'); resumeMusicIfIdle(); });
+      });
 
       $('#letterText').textContent = CONFIG.letter;
       buildStarfield();
     }
 
-    function playReel(i) {
-      document.querySelectorAll('.reel').forEach((r, j) => {
-        const vid = r.querySelector('video');
-        if (j === i) {
-          r.classList.add('playing');
-          vid.muted = false; vid.currentTime = 0;
-          vid.setAttribute('controls', '');
-          vid.play().catch(() => {});
-        } else {
-          r.classList.remove('playing');
-          vid.pause(); vid.removeAttribute('controls');
+    function startReel(i) {
+      const vid = document.querySelectorAll('.reel video')[i];
+      if (!vid) return;
+      vid.muted = false;
+      vid.setAttribute('controls', '');
+      vid.play().catch(() => {});
+    }
+
+    function anyVideoPlaying() {
+      return [...document.querySelectorAll('.reel video')].some(v => !v.paused && !v.ended);
+    }
+    function resumeMusicIfIdle() {
+      setTimeout(() => {
+        if (!anyVideoPlaying() && musicWasPlaying) {
+          musicWasPlaying = false;
+          music.play().then(setMusicBtn).catch(() => {});
         }
-      });
+      }, 250);
+    }
+    function goFullscreen(v) {
+      try {
+        const fn = v.requestFullscreen || v.webkitRequestFullscreen;
+        if (fn) { const p = fn.call(v); if (p && p.catch) p.catch(() => {}); }
+        else if (v.webkitEnterFullscreen) v.webkitEnterFullscreen();   // iOS Safari
+      } catch (e) {}
     }
 
     /* ================= countdown ================= */
@@ -550,7 +585,13 @@
 
     /* ================= music ================= */
     const music = $('#bgMusic'), mBtn = $('#musicBtn');
-    mBtn.onclick = () => { music.paused ? music.play() : music.pause(); mBtn.textContent = music.paused ? '♪' : '❚❚'; };
+    let musicWasPlaying = false;
+    function setMusicBtn() { mBtn.textContent = music.paused ? '♪' : '❚❚'; }
+    mBtn.onclick = () => {
+      if (music.paused) music.play(); else music.pause();
+      musicWasPlaying = !music.paused;
+      setMusicBtn();
+    };
 
     /* ================= start ================= */
     $('#startBtn').onclick = () => {
@@ -560,7 +601,7 @@
       tickClock(); setInterval(tickClock, 1000);
       tickLive();  setInterval(tickLive, 1000);
       mBtn.hidden = false;
-      music.play().then(() => mBtn.textContent = '❚❚').catch(() => {});
+      music.play().then(() => { musicWasPlaying = true; setMusicBtn(); }).catch(() => {});
       if (window.confetti) confetti({ particleCount: 120, spread: 100, origin: { y: .6 }, colors: ['#e9c46a', '#d98a9e', '#fff7e0'] });
       $('#content').scrollIntoView({ behavior: 'smooth' });
     };
