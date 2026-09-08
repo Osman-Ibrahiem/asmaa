@@ -304,7 +304,6 @@
 
       <section class="block reveal">
         <h2>دار عرض «لينا»</h2>
-        <p class="note">٤ فيديوهات على ٤ أغاني — دوسي شغّلي بصوت 🔊</p>
         <div class="cinema">
           <div class="marquee">عرض خاص · إحنا الاتنين بس</div>
           <div class="reels" id="reels"></div>
@@ -355,12 +354,12 @@
         { label: 'سنة نصيب',     from: 'firstMet', unit: 'years' },
       ],
 
-      /* ٤ فيديوهات — حطّ الملفات في videos/video1.mp4 ... video4.mp4 */
+      /* ٤ فيديوهات — الملفات في videos/video1.mp4 ... video4.mp4 */
       videos: [
-        { file: 'video1.mp4', cover: 'cover1.jpg', song: 'اسم الأغنية الأولى', line: 'أول رقصة لينا' },
-        { file: 'video2.mp4', cover: 'cover2.jpg', song: 'اسم الأغنية التانية', line: 'يوم حلو من أيامنا' },
-        { file: 'video3.mp4', cover: 'cover3.jpg', song: 'اسم الأغنية التالتة', line: 'ضحك من غير سبب' },
-        { file: 'video4.mp4', cover: 'cover4.jpg', song: 'اسم الأغنية الرابعة', line: 'إحنا في أحلى صورة' },
+        { file: 'video1.mp4', cover: 'cover1.jpg' },
+        { file: 'video2.mp4', cover: 'cover2.jpg' },
+        { file: 'video3.mp4', cover: 'cover3.jpg' },
+        { file: 'video4.mp4', cover: 'cover4.jpg' },
       ],
 
       /* جملة بتتغيّر كل ثانية تحت العدّاد */
@@ -447,7 +446,6 @@
             <source src="videos/${v.file}" type="video/mp4">
           </video>
           <button class="play" data-i="${i}" aria-label="تشغيل"><span class="ico">▶</span></button>
-          <div class="meta"><b>${v.song}</b><span>${v.line}</span></div>
         </div>`).join('');
 
       document.querySelectorAll('.reel .play').forEach(btn =>
@@ -456,6 +454,10 @@
       // علّم الكارت بإنه ناقص لو ملف الفيديو مش موجود
       document.querySelectorAll('.reel source').forEach(src =>
         src.addEventListener('error', () => src.closest('.reel').classList.add('missing')));
+
+      // اعرض أول فريم كصورة غلاف قبل التشغيل
+      document.querySelectorAll('.reel video').forEach(v =>
+        v.addEventListener('loadedmetadata', () => { try { v.currentTime = 0.1; } catch (e) {} }, { once: true }));
 
       $('#letterText').textContent = CONFIG.letter;
       buildStarfield();
